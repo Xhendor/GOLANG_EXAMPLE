@@ -2,12 +2,13 @@
 
 A simple RESTful CRUD API built with Go, using Gorilla Mux for routing and GORM with SQLite for data persistence.
 
-## Features
+# Project Structure:
+- models/: Contains the Book model and error definitions
+- handlers/: Contains HTTP request handlers
+- services/: Contains business logic
+- middleware/: Contains HTTP middleware (logging)
+- config/: Contains configuration management
 
-- Create, Read, Update, and Delete operations for books
-- SQLite database for data storage
-- RESTful API endpoints
-- JSON request/response format
 
 ## Prerequisites
 
@@ -23,6 +24,9 @@ go mod download
 ```
 
 ## Running the Application
+## Default Credentials:
+- Username: admin
+- Password: password
 
 ```bash
 go run main.go
@@ -42,7 +46,28 @@ The server will start on `http://localhost:8080`
 
 Create a new book:
 ```bash
+curl -X POST http://localhost:8080/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"password"}'
+
 curl -X POST http://localhost:8080/books \
--H "Content-Type: application/json" \
+-H "Content-Type: application/json " \
+-H "Authorization: Bearer YOUR_TOKEN" \
 -d '{"title":"The Go Programming Language","author":"Alan A. A. Donovan","isbn":"978-0134190440"}'
 ```
+# In Swagger UI (http://localhost:8080/swagger/):
+
+- Click the "Authorize" button at the top
+- Enter your token in the format: Bearer YOUR_TOKEN
+- Click "Authorize"
+- Now you can test all protected endpoints
+- The authentication system includes:
+
+- Login endpoint (/login)
+- JWT token generation
+- Token validation middleware
+- Protected routes for all book operations
+- Swagger documentation with authentication
+- Default credentials:
+
+
