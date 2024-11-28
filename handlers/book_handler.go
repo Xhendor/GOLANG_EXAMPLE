@@ -18,7 +18,16 @@ func NewBookHandler(service *services.BookService) *BookHandler {
 	return &BookHandler{service: service}
 }
 
+// GetBooks godoc
+// @Summary List books
+// @Description Get all books
+// @Tags books
+// @Accept json
+// @Produce json
+// @Success 200 {array} models.Book
+// @Router /books [get]
 func (h *BookHandler) GetBooks(w http.ResponseWriter, r *http.Request) {
+	var books []models.Book
 	books, err := h.service.GetAll()
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
@@ -27,6 +36,16 @@ func (h *BookHandler) GetBooks(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, books)
 }
 
+// GetBook godoc
+// @Summary Get a book
+// @Description Get a book by ID
+// @Tags books
+// @Accept json
+// @Produce json
+// @Param id path int true "Book ID"
+// @Success 200 {object} models.Book
+// @Failure 404 {object} map[string]string
+// @Router /books/{id} [get]
 func (h *BookHandler) GetBook(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
@@ -48,6 +67,16 @@ func (h *BookHandler) GetBook(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, book)
 }
 
+// CreateBook godoc
+// @Summary Create a book
+// @Description Create a new book
+// @Tags books
+// @Accept json
+// @Produce json
+// @Param book body models.Book true "Book object"
+// @Success 201 {object} models.Book
+// @Failure 400 {object} map[string]string
+// @Router /books [post]
 func (h *BookHandler) CreateBook(w http.ResponseWriter, r *http.Request) {
 	var book models.Book
 	if err := json.NewDecoder(r.Body).Decode(&book); err != nil {
@@ -69,6 +98,18 @@ func (h *BookHandler) CreateBook(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusCreated, book)
 }
 
+// UpdateBook godoc
+// @Summary Update a book
+// @Description Update a book by ID
+// @Tags books
+// @Accept json
+// @Produce json
+// @Param id path int true "Book ID"
+// @Param book body models.Book true "Book object"
+// @Success 200 {object} models.Book
+// @Failure 400 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Router /books/{id} [put]
 func (h *BookHandler) UpdateBook(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
@@ -102,6 +143,16 @@ func (h *BookHandler) UpdateBook(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, book)
 }
 
+// DeleteBook godoc
+// @Summary Delete a book
+// @Description Delete a book by ID
+// @Tags books
+// @Accept json
+// @Produce json
+// @Param id path int true "Book ID"
+// @Success 200 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Router /books/{id} [delete]
 func (h *BookHandler) DeleteBook(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
