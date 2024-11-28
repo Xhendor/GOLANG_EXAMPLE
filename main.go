@@ -22,6 +22,9 @@ import (
 // @description This is a Book Store API server.
 // @host localhost:8080
 // @BasePath /
+// @securityDefinitions.apikey Bearer
+// @in header
+// @name Authorization
 func main() {
 	// Load configuration
 	cfg := config.LoadConfig()
@@ -33,11 +36,12 @@ func main() {
 	}
 
 	// Auto migrate the schema
-	db.AutoMigrate(&models.Book{})
+	db.AutoMigrate(&models.Book{}, &models.User{})
 
 	// Initialize services and handlers
 	bookService := services.NewBookService(db)
 	bookHandler := handlers.NewBookHandler(bookService)
+	authHandler := handlers.NewAuthHandler()
 
 	// Initialize router
 	r := mux.NewRouter()
@@ -53,12 +57,19 @@ func main() {
 		httpSwagger.DomID("swagger-ui"),
 	))
 
-	// Define routes
-	r.HandleFunc("/books", bookHandler.GetBooks).Methods("GET")
-	r.HandleFunc("/books", bookHandler.CreateBook).Methods("POST")
-	r.HandleFunc("/books/{id}", bookHandler.GetBook).Methods("GET")
-	r.HandleFunc("/books/{id}", bookHandler.UpdateBook).Methods("PUT")
-	r.HandleFunc("/books/{id}", bookHandler.DeleteBook).Methods("DELETE")
+	// Public routes
+	r.HandleFunc("/login", authHandler.Login).Methods("POST")
+
+	// Protected routes
+	api := r.PathPrefix("").Subrouter()
+	api.Use(middleware.AuthMiddleware)
+
+	// Book routes
+	api.HandleFunc("/books", bookHandler.GetBooks).Methods("GET")
+	api.HandleFunc("/books", bookHandler.CreateBook).Methods("POST")
+	api.HandleFunc("/books/{id}", bookHandler.GetBook).Methods("GET")
+	api.HandleFunc("/books/{id}", bookHandler.UpdateBook).Methods("PUT")
+	api.HandleFunc("/books/{id}", bookHandler.DeleteBook).Methods("DELETE")
 
 	// Start server
 	log.Printf("Server is running on http://localhost:%s", cfg.ServerPort)

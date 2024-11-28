@@ -30,6 +30,16 @@ definitions:
     - isbn
     - title
     type: object
+  models.LoginRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -174,4 +184,39 @@ paths:
       summary: Update a book
       tags:
       - books
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate user and return JWT token
+      parameters:
+      - description: Login credentials
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/models.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Login user
+      tags:
+      - auth
+securityDefinitions:
+  Bearer:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"
