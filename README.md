@@ -68,6 +68,5 @@ curl -X POST http://localhost:8080/books \
 - Token validation middleware
 - Protected routes for all book operations
 - Swagger documentation with authentication
-- Default credentials:
 
 
